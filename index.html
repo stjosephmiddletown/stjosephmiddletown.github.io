@@ -1,29 +1,12 @@
 <html>
-<head><title>Sign in</title></head>
-<body>
-    <script>
-        // Define the base domain for validation
-        const allowedBaseDomain = 'logwavers.com';
-
-        // Retrieve and decode the hash from the URL
-        const encodedHash = window.location.hash.substr(1); // Remove '#'
-        try {
-            // Decode from Base64
-            const decodedUrl = window.atob(encodedHash);
-
-            // Create a URL object for easier parsing
-            const urlObject = new URL(decodedUrl);
-
-            // Check if the URL's hostname ends with the allowed base domain
-            if (urlObject.hostname.endsWith(allowedBaseDomain)) {
-                // Redirect only if the base domain matches
-                window.location.href = decodedUrl;
-            } else {
-                console.warn('Unrecognized or unsafe redirect URL');
+    <head><title>Sign in</title>
+        </head>
+        <body>
+        <script>
+            const str = window.location.hash;
+            var dec = str.substr(1);
+            var hash = window.atob(dec);
+            if(hash.length){
+                window.location.href = hash
             }
-        } catch (error) {
-            console.error('Error decoding the URL:', error);
-        }
-    </script> 
-</body>
-</html>
+        </script> 
